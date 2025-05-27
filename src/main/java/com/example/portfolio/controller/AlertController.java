@@ -21,10 +21,10 @@ import com.example.portfolio.service.AlertServiceImpl;
 
 public class AlertController {
 	@Autowired
-	private AlertServiceImpl alertService;
-	private UserServiceImpl userService;
+	private AlertService alertService;
+	private UserService userService;
 	
-	public AlertController(AlertServiceImpl alertService, UserService userService) {
+	public AlertController(AlertService alertService, UserService userService) {
 		this.alertService = alertService;
 		this.userService = userService;
 	}

@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 @Table(name = "users")
 public class User {
 @Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)   // we are using encapsulation (private key word)for getting details from user
+@GeneratedValue(strategy = GenerationType.IDENTITY)   // we are using encapsulation (private key word) for getting details from user
 private Long id;
 @Column(nullable = false)
 private String username;

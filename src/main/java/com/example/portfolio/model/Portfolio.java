@@ -1,9 +1,11 @@
 package com.example.portfolio.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
 // Each Portfolio belongs to one user which stores basic info like name and description.
 @Entity
 @Table(name = "portfolios")
+
 public class Portfolio {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

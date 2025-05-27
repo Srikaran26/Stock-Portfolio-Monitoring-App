@@ -1,9 +1,7 @@
 package com.example.portfolio.model;
 
 import java.time.LocalDateTime;
-
-import org.apache.catalina.User;
-
+import com.example.portfolio.model.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;

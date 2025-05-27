@@ -1,18 +1,28 @@
 package com.example.portfolio.model;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
 public class User {
 @Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)   // we are using encapsulation (private key word)for getting details from user
+@GeneratedValue(strategy = GenerationType.IDENTITY)   // we are using encapsulation (private key word) for getting details from user
 private Long id;
 @Column(nullable = false)
 private String username;
 @Column(nullable = false)
+@Pattern(
+        regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$",
+        message = "Invalid email format"
+    )
 private String emial;        
 @Column(nullable = false)
+@Pattern(
+        regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{8,}$",
+        message = "Password must be at least 8 characters, include upper/lowercase, number, and special character"
+    )
 private String passowrd;
 @Column(nullable = false)
 private String role = "USER";

@@ -1,6 +1,7 @@
 package com.example.portfolio.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
 public class Portfolio {
 	private Long id;
 	private String name;

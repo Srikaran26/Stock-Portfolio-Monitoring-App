@@ -16,7 +16,9 @@ public class Holding {
 	private Long id;
 	
 
+
 	// ManyToOne is used here because there are many holdings in a single portfolio .
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "portfolio_id")
 	private Portfolio portfolio;

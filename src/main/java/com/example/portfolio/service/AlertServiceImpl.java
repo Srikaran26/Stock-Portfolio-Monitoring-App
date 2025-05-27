@@ -32,5 +32,23 @@ public class AlertServiceImpl implements AlertService {
 	public List<Alert> getAllActiveAlerts() {
 	    return alertRepository.findByActiveTrue();
 	}
+	
+	public Alert updatedAlert(Long id, Double targetPrice, String alertType, Boolean active) {
+		Alert alert = alertRepository.findById(id).orElseThrow(() -> new RuntimeException("Alert not found"));
+		
+		if(targetPrice != null) {
+			alert.setTargetPrice(targetPrice);
+		}
+		
+		if(alertType != null) {
+			alert.setAlertType(alertType);
+		}
+		
+		if(active != null) {
+			alert.setActive(active);
+		}
+		return alertRepository.save(alert);
+	}
+
 
 }

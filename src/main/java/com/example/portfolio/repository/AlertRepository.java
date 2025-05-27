@@ -10,5 +10,6 @@ import com.example.portfolio.model.User;
 public interface AlertRepository extends JpaRepository<Alert, Long> {
 	List<Alert> getByUsername(User user);
 	List<Alert> findByActiveTrue();
+	List<Alert> findById();
 
 }

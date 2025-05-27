@@ -15,6 +15,7 @@ import com.example.portfolio.model.Alert;
 import com.example.portfolio.model.User;
 import com.example.portfolio.service.AlertService;
 import com.example.portfolio.service.AlertServiceImpl;
+import com.example.portfolio.service.UserService;
 
 @RestController
 @RequestMapping("/api/alerts")
@@ -34,14 +35,14 @@ public class AlertController {
 			@RequestParam String stockSymbol,
 			@RequestParam double targetPrice,
 			@RequestParam String alertType) {
-		User user = userService.getByUsername(username).orElseThrow(()--> new RuntimeException("User not found"));
+		User user = userService.getByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
 		return alertService.createdAlert(user, stockSymbol, targetPrice, alertType);
 	}
 	
 	@GetMapping("/alert")
 	public List<Alert> listAlerts(@RequestParam String username){
-		User user = userService.getByUsername(username).orElseThrow(()--> new RuntimeException("User not found"));
-		return alterservice.listUserAlerts(username);
+		User user = userService.getByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+		return alertService.listUserAlerts(username);
 	}
 	
 	@PutMapping("/{id}")

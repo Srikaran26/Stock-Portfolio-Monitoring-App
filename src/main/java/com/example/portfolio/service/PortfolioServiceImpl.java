@@ -2,9 +2,12 @@ package com.example.portfolio.service;
 import com.example.portfolio.model.Portfolio;
 import com.example.portfolio.model.User;
 import com.example.portfolio.repository.PortfolioRepository;
+import com.example.portfolio.dto.PortfolioRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PortfolioServiceImpl implements PortfolioService {
@@ -20,6 +23,10 @@ public class PortfolioServiceImpl implements PortfolioService {
 		p.setName(name);
 		p.setDescription(description);
 		return portfolioRepository.save(p);
+	}
+	@Override
+	public List<Portfolio> createMultiplePortfolios(List<PortfolioRequest> requests){
+		return requests.stream().map(req ->{ User user = new User(); user.setId(req.getUserId()); return createPortfolio(user, req.getName(), req.getDescription()); }).collect(Collectors.toList());
 	}
 	//Fetching all the portfolios for the existing user
 	@Override
@@ -51,5 +58,11 @@ public class PortfolioServiceImpl implements PortfolioService {
 		Portfolio portfolio = getPortfolioByIdAndUser(portfolioId, username);
 		portfolioRepository.delete(portfolio);
 	}
+	@Override
+	public Portfolio updatePortfolio(Long portfolioId, String username, String name, String description) {
+		Portfolio portfolio = getPortfolioByIdAndUser(portfolioId, username);
+		portfolio.setName(name);
+		portfolio.setDescription(description);
+		return portfolioRepository.save(portfolio);
+	}
 }
-

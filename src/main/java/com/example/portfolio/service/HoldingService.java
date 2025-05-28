@@ -14,4 +14,6 @@ public interface HoldingService  {
 	Holding updateHolding(Long id, int quantity, double buyPrice);
 	
 	void deleteHolding(Long id);
+	
+	Holding getHoldingById(Long id, String username);
 }

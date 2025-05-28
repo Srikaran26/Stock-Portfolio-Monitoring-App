@@ -4,9 +4,12 @@ import java.util.*;
 
 import org.springframework.stereotype.Service;
 
+import com.example.portfolio.exception.HoldingNotFoundException;
 import com.example.portfolio.model.Holding;
 import com.example.portfolio.model.Portfolio;
 import com.example.portfolio.repository.HoldingRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class HoldingServiceImpl implements HoldingService{
@@ -17,6 +20,7 @@ public class HoldingServiceImpl implements HoldingService{
 		this.holdingRepository = holdingRepository;
 	}
 	
+	@Transactional
 	public Holding addHolding (Portfolio portfolio, String stockSymbol, int quantity, double buyPrice) {
 		Holding h = new Holding();
 		h.setPortfolio(portfolio);
@@ -30,6 +34,7 @@ public class HoldingServiceImpl implements HoldingService{
 		return holdingRepository.findByPortfolio(portfolio);
 	}
 	
+	@Transactional
 	public Holding updateHolding(Long id, int quantity, double buyPrice) {
 		Holding h = holdingRepository.findById(id).orElseThrow();
 		h.setQuantity(quantity);
@@ -37,7 +42,16 @@ public class HoldingServiceImpl implements HoldingService{
 		return holdingRepository.save(h);
 	}
 	
+	@Transactional
 	public void deleteHolding(Long id) {
 		holdingRepository.deleteById(id);
+	}
+	
+	public Holding getHoldingById(Long id, String username) {
+		Holding h = holdingRepository.findById(id).orElseThrow(() -> new HoldingNotFoundException("Holding not found with ID: "+id));
+		if(!h.getPortfolio().getUser().getUsername().equals(username)) {
+			throw new RuntimeException("Unauthorized access");
+		}
+		return h;
 	}
 }

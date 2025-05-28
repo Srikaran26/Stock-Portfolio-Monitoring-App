@@ -1,23 +1,23 @@
 package com.example.portfolio.controller;
 
-import com.example.portfolio.service.StockPriceServiceImpl;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.example.portfolio.service.StockPriceService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/stock-prices")
-public class StockPriceController { 
-	
-	private final StockPriceServiceImpl stockPriceService;
-	
-	public StockPriceController(StockPriceServiceImpl stockPriceService) {
-		this.stockPriceService = stockPriceService;
-	}
-	
-	@GetMapping("/{symbol}/")
-    public ResponseEntity<Double> getPrice(@PathVariable String symbol) {
-        double price = stockPriceService.getPrice(symbol);
-        return ResponseEntity.ok(price);
+public class StockPriceController {
+
+    private final StockPriceService stockPriceService;
+
+    public StockPriceController(StockPriceService stockPriceService) {
+        this.stockPriceService = stockPriceService;
     }
-	
+
+    @GetMapping("/{symbol}")
+    public double getPrice(@PathVariable String symbol) {
+        return stockPriceService.getPrice(symbol);
+    }
 }

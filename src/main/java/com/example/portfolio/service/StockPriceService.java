@@ -1,7 +1,20 @@
 package com.example.portfolio.service;
 
-public interface StockPriceService{
-	
-	double getPrice(String stockSymbol);
-	double fetchLivePrice(String stockSymbol);
+import com.example.portfolio.model.StockPriceCache;
+
+import java.util.List;
+
+public interface StockPriceService {
+
+    double getPrice(String symbol);
+
+    double refreshPrice(String symbol);
+
+    List<StockPriceCache> getAllCachedPrices();
+
+    void clearCache();
+
+    boolean isApiAvailable();
+
+    int getCacheSize();
 }

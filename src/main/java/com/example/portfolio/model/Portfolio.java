@@ -1,6 +1,8 @@
 package com.example.portfolio.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
+
 
 // Each Portfolio belongs to one user which stores basic info like name and description.
 @Entity
@@ -16,6 +18,8 @@ public class Portfolio {
 	@JoinColumn(name = "user_id")
 	private User user;
 	private LocalDateTime createdAt = LocalDateTime.now();
+	@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Holding> holdings;
 	// Getters and Setters
 	public Long getId() {
 		return id;
@@ -46,5 +50,12 @@ public class Portfolio {
 	}
 	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
+	}
+	public List<Holding> getHoldings() {
+		return holdings;
+	}
+
+	public void setHoldings(List<Holding> holdings) {
+		this.holdings = holdings;
 	}
 }

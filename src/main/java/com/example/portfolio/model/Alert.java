@@ -86,6 +86,6 @@ public class Alert {
 		this.createdAt = createdAt;
 	}
 	
-	
+
 
 }

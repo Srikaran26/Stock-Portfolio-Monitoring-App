@@ -42,7 +42,7 @@ public class AlertController {
 	@GetMapping("/alert")
 	public List<Alert> listAlerts(@RequestParam String username){
 		User user = userService.getByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
-		return alertService.listUserAlerts(username);
+		return alertService.listUserAlerts(user);
 	}
 	
 	@PutMapping("/{id}")

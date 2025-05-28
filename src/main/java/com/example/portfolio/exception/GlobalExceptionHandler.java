@@ -31,4 +31,9 @@ public class GlobalExceptionHandler {
             "timestamp", LocalDateTime.now()
         ));
     }
+    
+    @ExceptionHandler(StockPriceFetchException.class)
+    public ResponseEntity<String> handleStockPriceFetchException(StockPriceFetchException ex) {
+        return ResponseEntity.status(503).body(ex.getMessage());  
+    }
 }

@@ -42,7 +42,7 @@ public class PortfolioController{
 	// Creating multiple portfolios for a user
 	@PostMapping("/bulk")
 	public List<Portfolio> createMultiplePortfolios(@RequestBody List<PortfolioRequest> requests) {
-		portfolioService.createMultiplePortfolios(requests);
+		return portfolioService.createMultiplePortfolios(requests);
 	}
 	// Updating the portfolio for the user
 	@PutMapping("/{id}")

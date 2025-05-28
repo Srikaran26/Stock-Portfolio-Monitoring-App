@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+
+//Custom repository method to retrieve a list of all portfolios for specific user
 @Repository
 public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
 

@@ -15,7 +15,7 @@ public class HoldingController {
 	private final UserService userService;
 	public HoldingController(HoldingService holdingService, PortfolioService portfolioService,
 			UserService userService) {
-		super();
+		
 		this.holdingService = holdingService;
 		this.portfolioService = portfolioService;
 		this.userService = userService;
@@ -40,7 +40,7 @@ public class HoldingController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<Holding>updateHoldinig(@PathVariable Long id,
+	public ResponseEntity<Holding>updateHolding(@PathVariable Long id,
 			                                     @RequestParam int quantity,
 			                                     @RequestParam double buyPrice){
 		Holding updated = holdingService.updateHolding(id,quantity,buyPrice);
@@ -51,6 +51,13 @@ public class HoldingController {
 	public ResponseEntity<Holding>deleteHolding(@PathVariable Long id){
 		holdingService.deleteHolding(id);
 		return ResponseEntity.noContent().build();
+	}
+	
+	@GetMapping("/holdings/{id}")
+	public ResponseEntity<Holding> getHoldingById(@RequestParam String username,
+			                                      @PathVariable Long id){
+		Holding h = holdingService.getHoldingById(id, username);
+		return ResponseEntity.ok(h);
 	}
 	
 }

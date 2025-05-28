@@ -26,6 +26,7 @@ public class Holding {
 	private String stockSymbol;
 	private int quantity;
 	private double buyPrice;
+	private double currentPrice;
 	
 	// We are creating getters and setters to access the private variable mentioned above .
 	
@@ -59,6 +60,13 @@ public class Holding {
 	public void setBuyPrice(double buyPrice) {
 		this.buyPrice = buyPrice;
 	}
+	public double getCurrentPrice() {
+		return currentPrice;
+	}
+	public void setCurrentPrice(double currentPrice) {
+		this.currentPrice = currentPrice;
+	}
+	
 	
 	
 

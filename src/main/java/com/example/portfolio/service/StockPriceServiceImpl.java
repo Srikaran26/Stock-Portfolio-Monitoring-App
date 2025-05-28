@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Random;
 
 @Service 
-public class StockPriceServiceImpl {
+public class StockPriceServiceImpl implements StockPriceService {
 	
 	private final StockPriceCacheRepository cacheRepository;
 	private final Random random = new Random();

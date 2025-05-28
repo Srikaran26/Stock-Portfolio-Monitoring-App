@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.portfolio.exception.AlertNotFoundException;
 import com.example.portfolio.model.Alert;
 import com.example.portfolio.model.User;
 import com.example.portfolio.repository.AlertRepository;
@@ -34,7 +35,7 @@ public class AlertServiceImpl implements AlertService {
 	}
 	
 	public Alert updatedAlert(Long id, Double targetPrice, String alertType, Boolean active) {
-		Alert alert = alertRepository.findById(id).orElseThrow(() -> new RuntimeException("Alert not found"));
+		Alert alert = alertRepository.findById(id).orElseThrow(() -> new AlertNotFoundException("Alert with ID " + id + " not found"));
 		
 		if(targetPrice != null) {
 			alert.setTargetPrice(targetPrice);

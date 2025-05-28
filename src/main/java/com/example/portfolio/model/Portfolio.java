@@ -1,6 +1,7 @@
 package com.example.portfolio.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 // Each Portfolio belongs to one user which stores basic info like name and description.
 @Entity

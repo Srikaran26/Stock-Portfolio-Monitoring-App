@@ -12,7 +12,7 @@ import com.example.portfolio.repository.AlertRepository;
 public class AlertServiceImpl implements AlertService {
 	private AlertRepository alertRepository;
 	
-	private AlertServiceImpl(AlertRepository alertRepository) {
+	public AlertServiceImpl(AlertRepository alertRepository) {
 		this.alertRepository = alertRepository;
 	}
 	@Override
@@ -27,7 +27,7 @@ public class AlertServiceImpl implements AlertService {
 	}
 	@Override
 	public List<Alert> listUserAlerts(User user){
-		return alertRepository.getByUsername(user);
+		return alertRepository.findByUser(user);
 	}
 	public List<Alert> getAllActiveAlerts() {
 	    return alertRepository.findByActiveTrue();

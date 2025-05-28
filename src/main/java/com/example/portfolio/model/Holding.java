@@ -3,14 +3,22 @@ package com.example.portfolio.model;
 import jakarta.persistence.*;
 
 //Creating a Entity with table name as "holdings" to store the stocks which are holding by the user.
+
 @Entity
 @Table(name = "holdings")
 public class Holding {
 	
+	// We set Id as primary key for this table .
 	@Id
+	
+	// The database will generate a unique primary key value for each new row added to the table, using an identity column . 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+
+
+	// ManyToOne is used here because there are many holdings in a single portfolio .
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "portfolio_id")
 	private Portfolio portfolio;
@@ -18,6 +26,8 @@ public class Holding {
 	private String stockSymbol;
 	private int quantity;
 	private double buyPrice;
+	
+	// We are creating getters and setters to access the private variable mentioned above .
 	
 	public Long getId() {
 		return id;

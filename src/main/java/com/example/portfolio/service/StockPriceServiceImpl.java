@@ -1,5 +1,6 @@
 package com.example.portfolio.service;
 
+import com.example.portfolio.exception.StockPriceFetchException;
 import com.example.portfolio.model.StockPriceCache;
 import com.example.portfolio.repository.StockPriceCacheRepository;
 import org.json.JSONObject;
@@ -11,7 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
-
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -40,6 +41,7 @@ public class StockPriceServiceImpl implements StockPriceService {
         this.rapidApiClient = webClientBuilder.baseUrl("https://" + rapidApiHost).build();
     }
 
+    // Fetch live price using RapidAPI
     private Double fetchPriceFromRapidApi(String symbol) {
         try {
             String response = rapidApiClient.get()
@@ -75,35 +77,77 @@ public class StockPriceServiceImpl implements StockPriceService {
     }
 
     @Override
-    public double getPrice(String stockSymbol) {
-        Optional<StockPriceCache> cacheOptional = cacheRepository.findById(stockSymbol);
+    public double getPrice(String symbol) {
+        Optional<StockPriceCache> cacheOptional = cacheRepository.findById(symbol);
 
         if (cacheOptional.isPresent()) {
             StockPriceCache cache = cacheOptional.get();
-            // Cache is valid for 1 hours so after 1 hour it can fetch the live prices
             if (cache.getLastUpdated().isAfter(LocalDateTime.now().minusHours(1))) {
-                logger.info("Returning cached price for symbol: {}", stockSymbol);
+                logger.info("Returning cached price for symbol: {}", symbol);
                 return cache.getPrice();
             } else {
-                logger.info("Cache expired for symbol: {}", stockSymbol);
+                logger.info("Cache expired for symbol: {}", symbol);
             }
         } else {
-            logger.info("No cache found for symbol: {}", stockSymbol);
+            logger.info("No cache found for symbol: {}", symbol);
         }
 
-        Double livePrice = fetchPriceFromRapidApi(stockSymbol);
+        Double livePrice = fetchPriceFromRapidApi(symbol);
 
         if (livePrice == null) {
-            // If API call fails, return 0.0 (or you can throw exception)
-            return 0.0;
+            throw new StockPriceFetchException("Failed to fetch live price for symbol: " + symbol);
         }
 
         StockPriceCache newCache = new StockPriceCache();
-        newCache.setStockSymbol(stockSymbol);
+        newCache.setStockSymbol(symbol);
         newCache.setPrice(livePrice);
         newCache.setLastUpdated(LocalDateTime.now());
         cacheRepository.save(newCache);
 
         return livePrice;
+    }
+
+    @Override
+    public double refreshPrice(String symbol) {
+        Double livePrice = fetchPriceFromRapidApi(symbol);
+
+        if (livePrice == null) {
+            throw new StockPriceFetchException("Failed to refresh live price for symbol: " + symbol);
+        }
+
+        StockPriceCache newCache = new StockPriceCache();
+        newCache.setStockSymbol(symbol);
+        newCache.setPrice(livePrice);
+        newCache.setLastUpdated(LocalDateTime.now());
+        cacheRepository.save(newCache);
+
+        return livePrice;
+    }
+
+    @Override
+    public List<StockPriceCache> getAllCachedPrices() {
+        return cacheRepository.findAll();
+    }
+
+    @Override
+    public void clearCache() {
+        cacheRepository.deleteAll();
+        logger.info("Cache cleared");
+    }
+
+    @Override
+    public boolean isApiAvailable() {
+        try {
+            Double price = fetchPriceFromRapidApi("TATAMOTORS");
+            return price != null;
+        } catch (Exception e) {
+            logger.error("API availability check failed", e);
+            return false;
+        }
+    }
+
+    @Override
+    public int getCacheSize() {
+        return (int) cacheRepository.count();
     }
 }

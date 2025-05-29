@@ -45,7 +45,7 @@ public class StockPriceServiceImpl implements StockPriceService {
         this.rapidApiClient = webClientBuilder.baseUrl("https://" + rapidApiHost).build();
     }
 
-    // Fetch live price using RapidAPI
+    // Fetching live price using RapidAPI 
     private Double fetchPriceFromRapidApi(String symbol) {
         try {
             String response = rapidApiClient.get()
@@ -94,7 +94,7 @@ public class StockPriceServiceImpl implements StockPriceService {
             return cache.getPrice();
         }
 
-        // Normal cache check is done here and fetch logic!!!
+        // Normal cache check is done here and logic is fetched!!
         Optional<StockPriceCache> cacheOptional = cacheRepository.findById(symbol);
 
         if (cacheOptional.isPresent()) {

@@ -65,7 +65,7 @@ public class PortfolioServiceImplTest {
 		portfolio.setUser(user);
 		when(portfolioRepository.findByIdAndUser_Username(1L, "testuser")).thenReturn(Optional.of(portfolio));
 		portfolioService.deletePortfolioByIdAndUser(1L, "testuser");
-		verify(portfolioRepository, times(1)).deleteById(1L);
+		verify(portfolioRepository, times(1)).delete(portfolio);
 		logger.info("Completed testDeletePortfolio");
 	}
 	@Test

@@ -8,6 +8,8 @@ import com.example.portfolio.repository.PortfolioRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/gain-loss")
 public class GainLossController {
+	private static final Logger logger = LoggerFactory.getLogger(GainLossController.class);
 	@Autowired
 	private final GainLossService gainLossService;
 	private final PortfolioRepository portfolioRepository;
@@ -23,13 +26,21 @@ public class GainLossController {
 		this.portfolioRepository=portfolioRepository;
 	}
 	
-	// Displays the calculated total gain/loss and percentage for a user's portfolio id
+	// Displays the calculated total gain/loss and percentage for a user's portfolio id while checking if portfolio exists
 	@GetMapping("/{portfolioId}")
 	public List<GainLossResponseDTO> calculateGainLoss(@PathVariable Long portfolioId) {
-		Portfolio portfolio=portfolioRepository.findById(portfolioId).orElseThrow(()->new RuntimeException("Portfolio not found"));
+		logger.info("Received request to calculate gain/loss for portfolio ID: {}",portfolioId);
+		Portfolio portfolio=portfolioRepository.findById(portfolioId)
+				.orElseThrow(()->{
+					logger.error("Portfolio not found with ID: {}",portfolioId);
+					return new RuntimeException("Portfolio not found");
+					});
 		List<GainLoss> gainLoss=gainLossService.calculateGainLoss(portfolio);
-		return gainLoss.stream()
+		logger.debug("Calculated gain/loss for portfolio ID {}: {}",portfolioId,gainLoss);
+		List<GainLossResponseDTO> response = gainLoss.stream()
 				.map(gl->new GainLossResponseDTO(gl.getHolding().getStockSymbol(),gl.getGain(),gl.getPercentage()))
 				.collect(Collectors.toList());
+		logger.info("Returning gain/loss response for portfolio ID {}: {}",portfolioId,response);
+		return response;
 	}
 }

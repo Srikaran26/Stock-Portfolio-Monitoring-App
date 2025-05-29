@@ -37,14 +37,12 @@ public class PortfolioController{
 		return portfolioService.listPortfolios(user);
 	}
 	// Creating a new Portfolio.
-
 	@PostMapping("/single")
 	public Portfolio createPortfolio(@RequestBody PortfolioRequest request) {
-
-    logger.info("Creating portfolio for userId: {}, name: {}", userId, name);
+		logger.info("Creating portfolio for userId: {}, name: {}", request.getUserId(), request.getName());
 		User user = new User();
 		user.setId(request.getUserId());
-		return portfolioService.createPortfolio(user,  request.getName(),  request.getDescription());
+		return portfolioService.createPortfolio(user, request.getName(),  request.getDescription());
 	}
 	// Creating multiple portfolios for a user
 	@PostMapping("/bulk")
@@ -58,12 +56,11 @@ public class PortfolioController{
 		logger.info("Updating portfolio with ID: {}", portfolioId, username);
 		return portfolioService.updatePortfolio(portfolioId,username,name,description);
 	}
-
-	//Deleting the portfolio
-	@DeleteMapping("/{portfolioId}")
-	public String deletePortfolio(@PathVariable("portfolioId") Long portfolioId, @RequestParam String username){
-    logger.info("Deleting portfolio with ID: {} for user: {}" , portfolioId, username);
-		portfolioService.deletePortfolio(portfolioId, username);
+	//Deleting the portfolio based on the id
+	@DeleteMapping("/{id}") 
+	public String deletePortfolio(@PathVariable Long portfolioId, @RequestParam String username){
+		logger.info("Deleting portfolio with ID: {} for user: {}" , portfolioId, username);
+		portfolioService.deletePortfolioByIdAndUser(portfolioId, username);
 		logger.info("Portfolio with ID: {} deleted successfully", portfolioId);
 		return "Portfolio deleted successfully.";
 	}

@@ -13,13 +13,13 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-
+     
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
-
+      // regestraton for new user
     @Override
     public User registerUser(User user) {
         user.setPassowrd(passwordEncoder.encode(user.getPassowrd()));
@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
     public Optional<User> getByUsername(String username) {
         return userRepository.findByUsername(username);
     }
-
+    //login of existing user
     @Override
     public boolean login(String username, String password) {
         Optional<User> userOpt = userRepository.findByUsername(username);

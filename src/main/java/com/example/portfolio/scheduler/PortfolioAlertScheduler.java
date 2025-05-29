@@ -46,7 +46,9 @@ public class PortfolioAlertScheduler {
 			boolean conditionMet = totalGainLoss>=alert.getThreshold();
 			
 			if(!alert.isTriggered() && conditionMet) {
-				notificationLogService.logNotification(null, "Alert triggered for value : " + totalGainLoss, "PORTFOLIO_ALERT");
+				String message = "Portfolio alert triggered for user '" + portfolio.getUser().getUsername() + "': Gain/Loss = " + totalGainLoss + ", Threshold = " + alert.getThreshold();
+				notificationLogService.logNotification(null,message, "PORTFOLIO_ALERT");
+				logger.info(message);
 				alert.setTriggered(true);
 				alert.setActive(true);
 				

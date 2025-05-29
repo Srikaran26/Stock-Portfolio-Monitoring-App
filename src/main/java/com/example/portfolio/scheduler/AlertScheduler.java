@@ -29,7 +29,7 @@ public class AlertScheduler {
 	@Scheduled(fixedRate = 60000)
 	public void checkStockAlerts() {
 		
-		logger.info("Running scheduled alert check...");
+		logger.info("Running scheduled alert check.");
 		
 		List<Alert> activeAlerts = alertService.getAllActiveAlerts();
 		
@@ -46,8 +46,13 @@ public class AlertScheduler {
 			}
 			
 			if(triggered) {
-				notificationLogService.logNotification(alert, "Alert for "+alert.getStockSymbol()+"triggered at price : "+currentPrice, "EMAIL");
+				String message = "Alert for "+alert.getStockSymbol()+" trigerred at price :  "+currentPrice;
+				
+				notificationLogService.logNotification(alert, message, "Stock_Alert");
+				
+				logger.info(message);
 			}
 		}
+		
 	}
 }

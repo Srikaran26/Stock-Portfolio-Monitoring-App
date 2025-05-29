@@ -33,6 +33,10 @@ public class AlertServiceImpl implements AlertService {
 	public List<Alert> getAllActiveAlerts() {
 	    return alertRepository.findByActiveTrue();
 	}
+	@Override
+	public Alert getAlertById(Long id) {
+	    return alertRepository.findById(id).orElseThrow(() -> new AlertNotFoundException("Alert not found"));
+	}
 	
 	public Alert updatedAlert(Long id, Double targetPrice, String alertType, Boolean active) {
 		Alert alert = alertRepository.findById(id).orElseThrow(() -> new AlertNotFoundException("Alert with ID " + id + " not found"));

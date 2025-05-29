@@ -1,11 +1,15 @@
 package com.example.portfolio.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 
 //Creating a Entity with table name as "holdings" to store the stocks which are holding by the user.
 
 @Entity
 @Table(name = "holdings")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Holding {
 	
 	// We set Id as primary key for this table .
@@ -15,7 +19,7 @@ public class Holding {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-
+	@JsonIgnore
 
 	// ManyToOne is used here because there are many holdings in a single portfolio .
 

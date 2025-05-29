@@ -3,14 +3,19 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 
 // Each Portfolio belongs to one user which stores basic info like name and description.
 @Entity
 @Table(name = "portfolios")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 
 public class Portfolio {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@JsonIgnore
 	private Long id;
 	private String name;
 	private String description;

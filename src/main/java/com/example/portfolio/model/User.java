@@ -4,8 +4,11 @@ import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name = "users")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
 @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)   // we are using encapsulation (private key word) for getting details from user

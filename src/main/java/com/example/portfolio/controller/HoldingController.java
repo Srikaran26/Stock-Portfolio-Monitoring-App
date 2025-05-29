@@ -2,8 +2,10 @@ package com.example.portfolio.controller;
 
 import org.springframework.web.bind.annotation.*;
 
+import com.example.portfolio.dto.UpdateHoldingRequest;
 import com.example.portfolio.model.*;
 import com.example.portfolio.service.*;
+import com.example.portfolio.repository.*;
 import org.springframework.http.ResponseEntity;
 import java.util.*;
 
@@ -41,9 +43,9 @@ public class HoldingController {
 	
 	@PutMapping("/{id}")
 	public ResponseEntity<Holding>updateHolding(@PathVariable Long id,
-			                                     @RequestParam int quantity,
-			                                     @RequestParam double buyPrice){
-		Holding updated = holdingService.updateHolding(id,quantity,buyPrice);
+			                                     @RequestBody UpdateHoldingRequest updateRequest){
+		
+		Holding updated = holdingService.updateHolding(id,updateRequest.getQuantity(),updateRequest.getBuyPrice());
 		return ResponseEntity.ok(updated);
 	}
 	
@@ -53,7 +55,7 @@ public class HoldingController {
 		return ResponseEntity.noContent().build();
 	}
 	
-	@GetMapping("/holdings/{id}")
+	@GetMapping("/holdings{id}")
 	public ResponseEntity<Holding> getHoldingById(@RequestParam String username,
 			                                      @PathVariable Long id){
 		Holding h = holdingService.getHoldingById(id, username);

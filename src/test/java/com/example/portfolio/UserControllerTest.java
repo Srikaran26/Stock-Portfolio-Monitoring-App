@@ -40,8 +40,8 @@ public class UserControllerTest {
 
         User user = new User();
         user.setUsername(username);
-        user.setEmial(email);
-        user.setPassowrd(password);
+        user.setEmail(email);
+        user.setPassword(password);
         user.setRole("USER");
 
         

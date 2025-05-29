@@ -18,13 +18,13 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
-
+     // registration endpoint
     @PostMapping("/register")
     public ResponseEntity<User> register(@Valid @RequestBody User user) {
         User savedUser = userService.registerUser(user);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
-
+     //login endpoint
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody User user) {
         boolean success = userService.login(user.getUsername(), user.getPassowrd());

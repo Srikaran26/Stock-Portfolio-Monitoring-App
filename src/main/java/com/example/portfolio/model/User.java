@@ -20,13 +20,13 @@ private String username;
         regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$",
         message = "Invalid email format"
     )
-private String emial;        
+private String email;        
 @Column(nullable = false)
 @Pattern(
         regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{8,}$",
         message = "Password must be at least 8 characters, include upper/lowercase, number, and special character"
     )
-private String passowrd;
+private String password;
 @Column(nullable = false)
 private String role = "USER";
 private LocalDateTime createAt = LocalDateTime.now();
@@ -42,17 +42,17 @@ public String getUsername() {
 public void setUsername(String username) {
 	this.username = username;
 }
-public String getEmial() {
-	return emial;
+public String getEmail() {
+	return email;
 }
-public void setEmial(String emial) {
-	this.emial = emial;
+public void setEmail(String email) {
+	this.email = email;
 }
-public String getPassowrd() {
-	return passowrd;
+public String getPassword() {
+	return password;
 }
-public void setPassowrd(String passowrd) {
-	this.passowrd = passowrd;
+public void setPassword(String password) {
+	this.password = password;
 }
 public String getRole() {
 	return role;

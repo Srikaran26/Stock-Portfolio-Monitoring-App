@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -30,6 +31,9 @@ public class StockPriceServiceImpl implements StockPriceService {
     private String rapidApiHost;
 
     private WebClient rapidApiClient;
+    
+    private Map<String, StockPriceCache> fakeCacheMap;
+
 
     public StockPriceServiceImpl(StockPriceCacheRepository cacheRepository, WebClient.Builder webClientBuilder) {
         this.cacheRepository = cacheRepository;
@@ -41,7 +45,7 @@ public class StockPriceServiceImpl implements StockPriceService {
         this.rapidApiClient = webClientBuilder.baseUrl("https://" + rapidApiHost).build();
     }
 
-    // Fetch live price using RapidAPI
+    // Fetching live price using RapidAPI 
     private Double fetchPriceFromRapidApi(String symbol) {
         try {
             String response = rapidApiClient.get()
@@ -78,6 +82,19 @@ public class StockPriceServiceImpl implements StockPriceService {
 
     @Override
     public double getPrice(String symbol) {
+        // If fake cache map is set (testing), use it first!!!
+        if (fakeCacheMap != null) {
+            StockPriceCache cache = fakeCacheMap.get(symbol);
+            if (cache == null) {
+                throw new StockPriceFetchException("No cache found for symbol: " + symbol);
+            }
+            if (cache.getLastUpdated().isBefore(LocalDateTime.now().minusHours(1))) {
+                throw new StockPriceFetchException("Cache expired for symbol: " + symbol);
+            }
+            return cache.getPrice();
+        }
+
+        // Normal cache check is done here and logic is fetched!!
         Optional<StockPriceCache> cacheOptional = cacheRepository.findById(symbol);
 
         if (cacheOptional.isPresent()) {
@@ -97,7 +114,6 @@ public class StockPriceServiceImpl implements StockPriceService {
         if (livePrice == null) {
             throw new StockPriceFetchException("Failed to fetch live price for symbol: " + symbol);
         }
-
         StockPriceCache newCache = new StockPriceCache();
         newCache.setStockSymbol(symbol);
         newCache.setPrice(livePrice);
@@ -149,5 +165,11 @@ public class StockPriceServiceImpl implements StockPriceService {
     @Override
     public int getCacheSize() {
         return (int) cacheRepository.count();
+    }
+    public Map<String, StockPriceCache> getFakeCacheMap() {
+        return fakeCacheMap;
+    }
+    public void setFakeCacheMap(Map<String, StockPriceCache> fakeCacheMap) {
+        this.fakeCacheMap = fakeCacheMap;
     }
 }

@@ -1,31 +1,46 @@
 package com.example.portfolio.controller;
+import com.example.portfolio.dto.GainLossResponseDTO;
+import com.example.portfolio.model.GainLoss;
 import com.example.portfolio.model.Portfolio;
-import com.example.portfolio.model.User;
 import com.example.portfolio.service.GainLossService;
-import com.example.portfolio.service.PortfolioService;
-import com.example.portfolio.service.UserService;
-import org.springframework.http.ResponseEntity;
+import com.example.portfolio.repository.PortfolioRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-// Exposing a mapped endpoint to obtain gain/loss for a user's portfolio
+// Uses RestController and RequestMapping to help provide a mapped endpoint for the api to obtain gain/loss for a user's portfolio
 @RestController
-@RequestMapping("/api/gainloss")
+@RequestMapping("/api/gain-loss")
 public class GainLossController {
+	private static final Logger logger = LoggerFactory.getLogger(GainLossController.class);
+	@Autowired
 	private final GainLossService gainLossService;
-	private final PortfolioService portfolioService;
-	private final UserService userService;
-	public GainLossController(GainLossService gainLossService,PortfolioService portfolioService,UserService userService) {
+	private final PortfolioRepository portfolioRepository;
+	public GainLossController(GainLossService gainLossService,PortfolioRepository portfolioRepository) {
 		this.gainLossService=gainLossService;
-		this.portfolioService=portfolioService;
-		this.userService=userService;
+		this.portfolioRepository=portfolioRepository;
 	}
 	
-	// Provides total gain/loss for a user's portfolio id
+	// Displays the calculated total gain/loss and percentage for a user's portfolio id while checking if portfolio exists
 	@GetMapping("/{portfolioId}")
-	public ResponseEntity<Double> getGainLoss(@RequestParam String username,@PathVariable Long portfolioId) {
-		User user=userService.getByUsername(username).orElseThrow();
-		Portfolio portfolio=portfolioService.getPortfolioByIdAndUser(portfolioId,username);
-		double gainLoss=gainLossService.calculateGainLoss(portfolio);
-		return ResponseEntity.ok(gainLoss);
+	public List<GainLossResponseDTO> calculateGainLoss(@PathVariable Long portfolioId) {
+		logger.info("Received request to calculate gain/loss for portfolio ID: {}",portfolioId);
+		Portfolio portfolio=portfolioRepository.findById(portfolioId)
+				.orElseThrow(()->{
+					logger.error("Portfolio not found with ID: {}",portfolioId);
+					return new RuntimeException("Portfolio not found");
+					});
+		List<GainLoss> gainLoss=gainLossService.calculateGainLoss(portfolio);
+		logger.debug("Calculated gain/loss for portfolio ID {}: {}",portfolioId,gainLoss);
+		List<GainLossResponseDTO> response = gainLoss.stream()
+				.map(gl->new GainLossResponseDTO(gl.getHolding().getStockSymbol(),gl.getGain(),gl.getPercentage()))
+				.collect(Collectors.toList());
+		logger.info("Returning gain/loss response for portfolio ID {}: {}",portfolioId,response);
+		return response;
 	}
 }

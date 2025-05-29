@@ -52,7 +52,7 @@ public class PortfolioController{
 	//Deleting the portfolio based on the id
 	@DeleteMapping("/{id}") 
 	public String deletePortfolio(@PathVariable Long portfolioId, @RequestParam String username){
-		portfolioService.deletePortfolio(portfolioId, username);
+		portfolioService.deletePortfolioByIdAndUser(portfolioId, username);
 		return "Portfolio deleted successfully.";
 	}
 	//Displays the holdings based on the user's portfolio id

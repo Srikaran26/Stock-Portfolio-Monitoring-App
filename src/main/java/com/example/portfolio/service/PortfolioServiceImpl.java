@@ -1,7 +1,9 @@
 package com.example.portfolio.service;
+import com.example.portfolio.model.Holding;
 import com.example.portfolio.model.Portfolio;
 import com.example.portfolio.model.User;
 import com.example.portfolio.repository.PortfolioRepository;
+import com.example.portfolio.repository.HoldingRepository;
 import com.example.portfolio.dto.PortfolioRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -12,8 +14,10 @@ import java.util.stream.Collectors;
 @Service
 public class PortfolioServiceImpl implements PortfolioService {
 	private final PortfolioRepository portfolioRepository;
-	public PortfolioServiceImpl(PortfolioRepository portfolioRepository) {
+	private final HoldingRepository holdingRepository;
+	public PortfolioServiceImpl(PortfolioRepository portfolioRepository, HoldingRepository holdingRepository) {
 		this.portfolioRepository = portfolioRepository;
+		this.holdingRepository = holdingRepository;
 	}
 	// Creating a new Portfolio for the existing user
 	@Override
@@ -54,7 +58,7 @@ public class PortfolioServiceImpl implements PortfolioService {
 	}
 	//Delete the portfolio by username and id
 	@Override
-	public void deletePortfolio(Long portfolioId, String username) {
+	public void deletePortfolioByIdAndUser(Long portfolioId, String username) {
 		Portfolio portfolio = getPortfolioByIdAndUser(portfolioId, username);
 		portfolioRepository.delete(portfolio);
 	}
@@ -64,5 +68,16 @@ public class PortfolioServiceImpl implements PortfolioService {
 		portfolio.setName(name);
 		portfolio.setDescription(description);
 		return portfolioRepository.save(portfolio);
+	}
+	public Double getTotalValueOfPortfolio(Long portfolioId) {
+		List<Holding> holdings = holdingRepository.findByPortfolio(portfolioId);
+		double total = 0.0;
+		for(Holding h : holdings) {
+			Double price = getCurrentStockPrice(h.getStockSymbol());
+			if(price != null) {
+				total += price * h.getQuantity();
+			}
+		}
+		return total;
 	}
 }

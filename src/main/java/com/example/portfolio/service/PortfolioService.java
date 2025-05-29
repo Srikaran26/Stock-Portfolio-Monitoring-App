@@ -12,8 +12,9 @@ public interface PortfolioService {
     List<Portfolio> listPortfolios(User user);
     Double getCurrentStockPrice(String stockSymbol);
     Portfolio getPortfolioByIdAndUser(Long portfolioId, String username);
-    void deletePortfolio(Long portfolioId, String username);
+    void deletePortfolioByIdAndUser(Long portfolioId, String username);
     Portfolio updatePortfolio(Long portfolioId, String username, String name, String description);
+    Double getTotalValueOfPortfolio(Long portfolioId);
 }
 
 

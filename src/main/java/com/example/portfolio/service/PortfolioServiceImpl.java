@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,14 +71,22 @@ public class PortfolioServiceImpl implements PortfolioService {
 		return portfolioRepository.save(portfolio);
 	}
 	public Double getTotalValueOfPortfolio(Long portfolioId) {
-		List<Holding> holdings = holdingRepository.findByPortfolio(portfolioId);
-		double total = 0.0;
-		for(Holding h : holdings) {
-			Double price = getCurrentStockPrice(h.getStockSymbol());
-			if(price != null) {
-				total += price * h.getQuantity();
-			}
-		}
-		return total;
+	    // Fetch the Portfolio object by ID
+	    Optional<Portfolio> portfolioOpt = portfolioRepository.findById(portfolioId);
+	    if (portfolioOpt.isEmpty()) {
+	        throw new RuntimeException("Portfolio with ID " + portfolioId + " not found");
+	    }
+
+	    Portfolio portfolio = portfolioOpt.get();
+	    List<Holding> holdings = holdingRepository.findByPortfolio(portfolio);
+
+	    double total = 0.0;
+	    for (Holding h : holdings) {
+	        Double price = getCurrentStockPrice(h.getStockSymbol());
+	        if (price != null) {
+	            total += price * h.getQuantity();
+	        }
+	    }
+	    return total;
 	}
 }

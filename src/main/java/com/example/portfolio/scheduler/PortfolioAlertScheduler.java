@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.example.portfolio.model.GainLoss;
 import com.example.portfolio.model.Portfolio;
 import com.example.portfolio.model.PortfolioAlert;
 import com.example.portfolio.repository.HoldingRepository;
@@ -41,7 +42,11 @@ public class PortfolioAlertScheduler {
 		for(PortfolioAlert alert : alerts) {
 			Portfolio portfolio = alert.getPortfolio();
 			
-			double totalGainLoss = gainLossService.calculateGainLoss(portfolio);
+			List<GainLoss> gainLossList = gainLossService.calculateGainLoss(portfolio);
+			
+			double totalGainLoss = gainLossList.stream()
+                    .mapToDouble(GainLoss::getGain)
+                    .sum();
 			
 			boolean conditionMet = totalGainLoss>=alert.getThreshold();
 			

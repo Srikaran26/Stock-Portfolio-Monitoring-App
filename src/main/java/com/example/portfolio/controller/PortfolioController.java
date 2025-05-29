@@ -25,7 +25,7 @@ public class PortfolioController{
 		this.holdingRepository = holdingRepository;
 		this.portfolioRepository = portfolioRepository;
 	}
-	// List of all the portfolios for the user.
+	// Provides a list of all the portfolios for the user.
 	@GetMapping
 	public List<Portfolio> getPortfolios(@RequestParam Long userId){
 		User user = new User();
@@ -44,18 +44,18 @@ public class PortfolioController{
 	public List<Portfolio> createMultiplePortfolios(@RequestBody List<PortfolioRequest> requests) {
 		return portfolioService.createMultiplePortfolios(requests);
 	}
-	// Updating the portfolio for the user
+	// Updating the portfolio for the user based on id
 	@PutMapping("/{id}")
 	public Portfolio updatePortfolio(@PathVariable Long portfolioId, @RequestParam String username, @RequestParam String name, @RequestParam String description) {
 		return portfolioService.updatePortfolio(portfolioId,username,name,description);
 	}
-	//Deleting the portfolio
-	@DeleteMapping("/{id}")
+	//Deleting the portfolio based on the id
+	@DeleteMapping("/{id}") 
 	public String deletePortfolio(@PathVariable Long portfolioId, @RequestParam String username){
 		portfolioService.deletePortfolio(portfolioId, username);
 		return "Portfolio deleted successfully.";
 	}
-	//Getting the holdings for a random portfolio
+	//Displays the holdings based on the user's portfolio id
 	@GetMapping("/{id}/holdings")
 	public List<Holding> getHoldingsByPortfolio(@PathVariable("id") Long portfolioId) {
 		Portfolio portfolio=portfolioRepository.findById(portfolioId)

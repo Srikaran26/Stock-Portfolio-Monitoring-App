@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-// Exposing a mapped endpoint to obtain gain/loss for a user's portfolio
+// Uses RestController and RequestMapping to help provide a mapped endpoint for the api to obtain gain/loss for a user's portfolio
 @RestController
 @RequestMapping("/api/gain-loss")
 public class GainLossController {
@@ -23,7 +23,7 @@ public class GainLossController {
 		this.portfolioRepository=portfolioRepository;
 	}
 	
-	// Provides total gain/loss for a user's portfolio id
+	// Displays the calculated total gain/loss and percentage for a user's portfolio id
 	@GetMapping("/{portfolioId}")
 	public List<GainLossResponseDTO> calculateGainLoss(@PathVariable Long portfolioId) {
 		Portfolio portfolio=portfolioRepository.findById(portfolioId).orElseThrow(()->new RuntimeException("Portfolio not found"));

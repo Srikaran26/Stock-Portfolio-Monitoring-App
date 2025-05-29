@@ -12,14 +12,14 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-// Implementing gainLossService interface for computing gain/loss in a user's portfolio
+// Implementing holdingRepository, stockPriceService and gainLossRepository in gainLossService interface for computing gain/loss in a user's portfolio
 @Service
 public class GainLossServiceImpl implements GainLossService {
 		private final HoldingRepository holdingRepository;
 		private final StockPriceService stockPriceService;
 		private final GainLossRepository gainLossRepository;
 		
-		//	Providing the current instance values of the user's portfolio 
+		//	Resolves and injects the dependencies shown below for this code 
 		@Autowired
 		public GainLossServiceImpl(HoldingRepository holdingRepository, StockPriceService stockPriceService, GainLossRepository gainLossRepository) {
 			this.holdingRepository=holdingRepository;
@@ -27,7 +27,7 @@ public class GainLossServiceImpl implements GainLossService {
 			this.gainLossRepository=gainLossRepository;
 		}
 		
-		// Formula for calculating gain/loss in the given investment portfolio
+		// Implementation of formula for calculating gain/loss, investment and percentage of gain/loss in the given investment portfolio
 		@Override
 		public List<GainLoss> calculateGainLoss(Portfolio portfolio) {
 			List<Holding> holdings=holdingRepository.findByPortfolio(portfolio);

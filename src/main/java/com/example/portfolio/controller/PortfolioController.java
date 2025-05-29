@@ -33,11 +33,11 @@ public class PortfolioController{
 		return portfolioService.listPortfolios(user);
 	}
 	// Creating a new Portfolio.
-	@PostMapping
-	public Portfolio createPortfolio(@RequestParam Long userId,@RequestParam String name, @RequestParam String description) {
+	@PostMapping("/single")
+	public Portfolio createPortfolio(@RequestBody PortfolioRequest request) {
 		User user = new User();
-		user.setId(userId);
-		return portfolioService.createPortfolio(user,  name,  description);
+		user.setId(request.getUserId());
+		return portfolioService.createPortfolio(user,  request.getName(),  request.getDescription());
 	}
 	// Creating multiple portfolios for a user
 	@PostMapping("/bulk")
@@ -50,8 +50,8 @@ public class PortfolioController{
 		return portfolioService.updatePortfolio(portfolioId,username,name,description);
 	}
 	//Deleting the portfolio
-	@DeleteMapping("/{id}")
-	public String deletePortfolio(@PathVariable Long portfolioId, @RequestParam String username){
+	@DeleteMapping("/{portfolioId}")
+	public String deletePortfolio(@PathVariable("portfolioId") Long portfolioId, @RequestParam String username){
 		portfolioService.deletePortfolio(portfolioId, username);
 		return "Portfolio deleted successfully.";
 	}

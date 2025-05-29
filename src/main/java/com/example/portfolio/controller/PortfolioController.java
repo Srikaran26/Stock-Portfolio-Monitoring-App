@@ -37,12 +37,12 @@ public class PortfolioController{
 		return portfolioService.listPortfolios(user);
 	}
 	// Creating a new Portfolio.
-	@PostMapping
-	public Portfolio createPortfolio(@RequestParam Long userId,@RequestParam String name, @RequestParam String description) {
-		logger.info("Creating portfolio for userId: {}, name: {}", userId, name);
+	@PostMapping("/single")
+	public Portfolio createPortfolio(@RequestBody PortfolioRequest request) {
+		logger.info("Creating portfolio for userId: {}, name: {}", request.getUserId(), request.getName());
 		User user = new User();
-		user.setId(userId);
-		return portfolioService.createPortfolio(user,  name,  description);
+		user.setId(request.getUserId());
+		return portfolioService.createPortfolio(user, request.getName(),  request.getDescription());
 	}
 	// Creating multiple portfolios for a user
 	@PostMapping("/bulk")

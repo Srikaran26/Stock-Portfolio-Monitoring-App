@@ -19,7 +19,7 @@ public class UpdateHoldingRequest {
 		return buyPrice;
 	}
 	public void setBuyPrice(double buyPrice) {
-		this.buyPrice = buyPrice;
+		this.buyPrice =buyPrice;
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.example.portfolio.exception;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -30,6 +31,11 @@ public class GlobalExceptionHandler {
             "message", ex.getMessage(),
             "timestamp", LocalDateTime.now()
         ));
+    }
+    
+    @ExceptionHandler(CsvImportException.class)
+    public ResponseEntity<String> handleCsvImport(CsvImportException ex) {
+        return new ResponseEntity<>("CSV Import Error: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
     
     @ExceptionHandler(StockPriceFetchException.class)

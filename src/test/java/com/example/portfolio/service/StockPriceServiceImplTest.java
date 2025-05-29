@@ -1,7 +1,5 @@
 package com.example.portfolio.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.example.portfolio.exception.StockPriceFetchException;
 import com.example.portfolio.model.StockPriceCache;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,15 +8,18 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class StockPriceServiceImplTest {
 
     private StockPriceServiceImpl stockPriceService;
 
     @BeforeEach
     public void setup() {
-        stockPriceService = new StockPriceServiceImpl(null, null);  // Passing null because not testing real repo or web client here
+        // Initialize the service with null repository since we are only testing fake cache logic
+        stockPriceService = new StockPriceServiceImpl(null);
 
-        // Setting up fake cache map for simulating cache without mocking repository
+        // Setup fake cache
         stockPriceService.setFakeCacheMap(new HashMap<>());
     }
 
@@ -27,7 +28,7 @@ public class StockPriceServiceImplTest {
         StockPriceCache cache = new StockPriceCache();
         cache.setStockSymbol("TATAMOTORS");
         cache.setPrice(150.0);
-        cache.setLastUpdated(LocalDateTime.now().minusMinutes(10)); // fresh cache
+        cache.setLastUpdated(LocalDateTime.now().minusMinutes(10)); // Fresh cache
 
         stockPriceService.getFakeCacheMap().put("TATAMOTORS", cache);
 
@@ -41,7 +42,7 @@ public class StockPriceServiceImplTest {
         StockPriceCache cache = new StockPriceCache();
         cache.setStockSymbol("TATAMOTORS");
         cache.setPrice(100.0);
-        cache.setLastUpdated(LocalDateTime.now().minusHours(2)); // expired cache
+        cache.setLastUpdated(LocalDateTime.now().minusHours(2)); // Expired cache
 
         stockPriceService.getFakeCacheMap().put("TATAMOTORS", cache);
 
@@ -51,10 +52,11 @@ public class StockPriceServiceImplTest {
     }
 
     @Test
-    public void testThrowsExceptionWhenNoCache() {
+    public void testThrowsExceptionWhenNoCacheExists() {
+        // No entry added to cache
 
         assertThrows(StockPriceFetchException.class, () -> {
             stockPriceService.getPrice("TATAMOTORS");
-        }, "Should throw exception when cache is missing");
+        }, "Should throw exception when no cache exists");
     }
 }

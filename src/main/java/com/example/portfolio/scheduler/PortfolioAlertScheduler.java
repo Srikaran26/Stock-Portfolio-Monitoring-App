@@ -65,8 +65,8 @@ public class PortfolioAlertScheduler {
                 logger.info(message);
 
                 alert.setTriggered(true);
-                alert.setActive(false); // deactivate after trigger
-                portfolioAlertRepository.save(alert); // triggers update in DB
+                alert.setActive(false); 
+                portfolioAlertRepository.save(alert); 
             }
         }
     }

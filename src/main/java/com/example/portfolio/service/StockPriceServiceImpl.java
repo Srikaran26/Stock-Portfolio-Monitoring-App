@@ -1,6 +1,7 @@
 package com.example.portfolio.service;
 
 import com.example.portfolio.exception.StockPriceFetchException;
+
 import com.example.portfolio.model.StockPriceCache;
 import com.example.portfolio.repository.StockPriceCacheRepository;
 import org.json.JSONObject;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.*;
 
 @Service
 public class StockPriceServiceImpl implements StockPriceService {
@@ -30,105 +32,99 @@ public class StockPriceServiceImpl implements StockPriceService {
     @Value("${rapidapi.host}")
     private String rapidApiHost;
 
+    @Value("${cache.validity.hours:24}")
+    private int cacheValidityHours;
+
     private Map<String, StockPriceCache> fakeCacheMap;
+    
 
     public StockPriceServiceImpl(StockPriceCacheRepository cacheRepository) {
         this.cacheRepository = cacheRepository;
     }
 
-    // Fetch live price using RestTemplate and RapidAPI
     private Double fetchPriceFromRapidApi(String symbol) {
+        String url = "https://" + rapidApiHost + "/v1/rapidapi/stock/quote?tradingSymbol=" + symbol + "&exchange=NSE";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-RapidAPI-Key", rapidApiKey);
+        headers.set("X-RapidAPI-Host", rapidApiHost);
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
         try {
-            String url = "https://" + rapidApiHost + "/v1/rapidapi/stock/quote"
-                    + "?tradingSymbol=" + symbol
-                    + "&exchange=NSE";
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("X-RapidAPI-Key", rapidApiKey);
-            headers.set("X-RapidAPI-Host", rapidApiHost);
-
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-
-            ResponseEntity<String> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    entity,
-                    String.class
-            );
-
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
             String body = response.getBody();
-            logger.info("Raw API response for symbol {}: {}", symbol, body);
+            logger.info("📡 Raw API response for {}: {}", symbol, body);
 
-            if (body == null || body.isEmpty()) {
-                logger.warn("Empty response from RapidAPI for symbol: {}", symbol);
-                return null;
-            }
+            if (body == null || body.isEmpty()) return null;
 
             JSONObject json = new JSONObject(body);
-            if (json.has("lastPrice")) {
-                return json.getDouble("lastPrice");
-            } else {
-                logger.warn("lastPrice not found in RapidAPI response for symbol: {}", symbol);
-                return null;
-            }
-
+            return json.has("lastPrice") ? json.getDouble("lastPrice") : null;
         } catch (Exception e) {
-            logger.error("Error fetching price from RapidAPI for symbol: " + symbol, e);
+            logger.error("❌ Error calling RapidAPI for {}: {}", symbol, e.getMessage());
             return null;
         }
     }
 
     @Override
     public double getPrice(String symbol) {
-        if (fakeCacheMap != null) {
-            StockPriceCache cache = fakeCacheMap.get(symbol);
-            if (cache == null || cache.getLastUpdated().isBefore(LocalDateTime.now().minusHours(1))) {
-                throw new StockPriceFetchException("Invalid or expired cache for symbol: " + symbol);
-            }
-            return cache.getPrice();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<Double> future = executor.submit(() -> fetchPriceFromRapidApi(symbol));
+
+        Double price = null;
+
+        try {
+            price = future.get(5, TimeUnit.SECONDS); // timeout after 5 seconds
+        } catch (TimeoutException te) {
+            logger.warn("⚠️ API timeout for symbol {}", symbol);
+            future.cancel(true);
+        } catch (Exception e) {
+            logger.error("⚠️ API exception for {}: {}", symbol, e.getMessage());
+        } finally {
+            executor.shutdown();
         }
 
-        Optional<StockPriceCache> cacheOptional = cacheRepository.findById(symbol);
-        if (cacheOptional.isPresent()) {
-            StockPriceCache cache = cacheOptional.get();
-            if (cache.getLastUpdated().isAfter(LocalDateTime.now().minusHours(1))) {
-                logger.info("Returning cached price for symbol: {}", symbol);
-                return cache.getPrice();
+        // ✅ If API succeeded, update cache and return
+        if (price != null) {
+            StockPriceCache cache = new StockPriceCache();
+            cache.setStockSymbol(symbol);
+            cache.setPrice(price);
+            cache.setLastUpdated(LocalDateTime.now());
+            cacheRepository.save(cache);
+            logger.info("✅ Updated price from API for {}: {}", symbol, price);
+            return price;
+        }
+
+        // ✅ If API failed, return price from cache if available and recent
+        Optional<StockPriceCache> optionalCache = cacheRepository.findById(symbol);
+        if (optionalCache.isPresent()) {
+            StockPriceCache cached = optionalCache.get();
+            if (cached.getLastUpdated().isAfter(LocalDateTime.now().minusHours(cacheValidityHours))) {
+                logger.warn("⚠️ Using fallback cached price for {}: {}", symbol, cached.getPrice());
+                return cached.getPrice();
             } else {
-                logger.info("Cache expired for symbol: {}", symbol);
+                logger.warn("⚠️ Cached price for {} is outdated: {}", symbol, cached.getLastUpdated());
             }
-        } else {
-            logger.info("No cache found for symbol: {}", symbol);
         }
 
-        Double livePrice = fetchPriceFromRapidApi(symbol);
-        if (livePrice == null) {
-            throw new StockPriceFetchException("Failed to fetch live price for symbol: " + symbol);
-        }
-
-        StockPriceCache newCache = new StockPriceCache();
-        newCache.setStockSymbol(symbol);
-        newCache.setPrice(livePrice);
-        newCache.setLastUpdated(LocalDateTime.now());
-        cacheRepository.save(newCache);
-
-        return livePrice;
+        // ❌ Total failure
+        logger.error("❌ No valid price available for {}", symbol);
+        throw new StockPriceFetchException("Unable to fetch stock price for: " + symbol);
     }
 
     @Override
     public double refreshPrice(String symbol) {
-        Double livePrice = fetchPriceFromRapidApi(symbol);
-        if (livePrice == null) {
-            throw new StockPriceFetchException("Failed to refresh live price for symbol: " + symbol);
+        Double price = fetchPriceFromRapidApi(symbol);
+        if (price == null) {
+            throw new StockPriceFetchException("Failed to refresh price for: " + symbol);
         }
 
-        StockPriceCache newCache = new StockPriceCache();
-        newCache.setStockSymbol(symbol);
-        newCache.setPrice(livePrice);
-        newCache.setLastUpdated(LocalDateTime.now());
-        cacheRepository.save(newCache);
+        StockPriceCache cache = new StockPriceCache();
+        cache.setStockSymbol(symbol);
+        cache.setPrice(price);
+        cache.setLastUpdated(LocalDateTime.now());
+        cacheRepository.save(cache);
 
-        return livePrice;
+        return price;
     }
 
     @Override
@@ -139,16 +135,15 @@ public class StockPriceServiceImpl implements StockPriceService {
     @Override
     public void clearCache() {
         cacheRepository.deleteAll();
-        logger.info("Cache cleared");
+        logger.info("🧹 Cache cleared");
     }
 
     @Override
     public boolean isApiAvailable() {
         try {
-            Double price = fetchPriceFromRapidApi("TATAMOTORS");
-            return price != null;
+            return fetchPriceFromRapidApi("TATAMOTORS") != null;
         } catch (Exception e) {
-            logger.error("API availability check failed", e);
+            logger.error("❌ API availability check failed", e);
             return false;
         }
     }

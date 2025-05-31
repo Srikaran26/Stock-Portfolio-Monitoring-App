@@ -3,38 +3,58 @@ package com.example.portfolio.service;
 import com.example.portfolio.model.Alert;
 import com.example.portfolio.model.User;
 import com.example.portfolio.repository.AlertRepository;
-import jakarta.transaction.Transactional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@Transactional
-class AlertServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+public class AlertServiceImplTest {
 
-    @Autowired
+    @Mock
     private AlertRepository alertRepository;
 
+    @InjectMocks
     private AlertServiceImpl alertService;
 
     private User user;
 
     @BeforeEach
-    void setup() {
-        alertService = new AlertServiceImpl(alertRepository);
-
+    public void setup() {
         user = new User();
-        user.setId(1L);
         user.setUsername("testuser");
+        user.setEmail("testuser@example.com");
+        user.setPassword("testpass");
+        user.setRole("USER");
+        user.setCreateAt(LocalDateTime.now());
     }
 
     @Test
-    void testCreateAlert() {
+    public void testCreateAlert() {
+        Alert savedAlert = new Alert();
+        savedAlert.setId(1L);
+        savedAlert.setUser(user);
+        savedAlert.setStockSymbol("AAPL");
+        savedAlert.setTargetPrice(150.0);
+        savedAlert.setAlertType("PRICE");
+        savedAlert.setActive(true);
+
+        
+        when(alertRepository.save(any(Alert.class))).thenReturn(savedAlert);
+
         Alert alert = alertService.createdAlert(user, "AAPL", 150.0, "PRICE");
 
         assertNotNull(alert.getId());
@@ -42,45 +62,76 @@ class AlertServiceImplTest {
         assertEquals(150.0, alert.getTargetPrice());
         assertEquals("PRICE", alert.getAlertType());
         assertTrue(alert.isActive());
-        assertEquals(user, alert.getUser());
+        assertEquals(user.getUsername(), alert.getUser().getUsername());
+
+        
+        verify(alertRepository, times(1)).save(any(Alert.class));
     }
 
     @Test
-    void testListUserAlerts() {
-        alertService.createdAlert(user, "AAPL", 150.0, "PRICE");
-        alertService.createdAlert(user, "TSLA", 180.0, "VOLUME");
+    public void testListUserAlerts() {
+        Alert alert1 = new Alert();
+        Alert alert2 = new Alert();
+        alert1.setUser(user);
+        alert2.setUser(user);
 
-        List<Alert> alerts = alertService.listUserAlerts(user);
-        assertEquals(2, alerts.size());
+        List<Alert> alerts = Arrays.asList(alert1, alert2);
+
+        when(alertRepository.findByUser(user)).thenReturn(alerts);
+
+        List<Alert> result = alertService.listUserAlerts(user);
+
+        assertEquals(2, result.size());
+        verify(alertRepository, times(1)).findByUser(user);
     }
 
     @Test
-    void testGetAllActiveAlerts() {
-        alertService.createdAlert(user, "AAPL", 150.0, "PRICE");
-        Alert inactiveAlert = alertService.createdAlert(user, "TSLA", 190.0, "PRICE");
-        inactiveAlert.setActive(false);
-        alertRepository.save(inactiveAlert);
+    public void testGetAllActiveAlerts() {
+        Alert activeAlert = new Alert();
+        activeAlert.setActive(true);
 
-        List<Alert> activeAlerts = alertService.getAllActiveAlerts();
-        assertEquals(1, activeAlerts.size());
+        List<Alert> activeAlerts = List.of(activeAlert);
+
+        when(alertRepository.findByActiveTrue()).thenReturn(activeAlerts);
+
+        List<Alert> result = alertService.getAllActiveAlerts();
+
+        assertEquals(1, result.size());
+        assertTrue(result.get(0).isActive());
+        verify(alertRepository, times(1)).findByActiveTrue();
     }
 
     @Test
-    void testGetAlertById() {
-        Alert alert = alertService.createdAlert(user, "MSFT", 200.0, "PRICE");
-        Alert fetched = alertService.getAlertById(alert.getId());
+    public void testGetAlertById() {
+        Alert alert = new Alert();
+        alert.setId(1L);
 
-        assertEquals(alert.getId(), fetched.getId());
+        when(alertRepository.findById(1L)).thenReturn(Optional.of(alert));
+
+        Alert result = alertService.getAlertById(1L);
+
+        assertEquals(1L, result.getId());
+        verify(alertRepository, times(1)).findById(1L);
     }
 
     @Test
-    void testUpdatedAlert() {
-        Alert alert = alertService.createdAlert(user, "AMZN", 220.0, "PRICE");
+    public void testUpdatedAlert() {
+        Alert alert = new Alert();
+        alert.setId(1L);
+        alert.setTargetPrice(220.0);
+        alert.setAlertType("PRICE");
+        alert.setActive(true);
 
-        Alert updated = alertService.updatedAlert(alert.getId(), 250.0, "VOLUME", false);
+        when(alertRepository.findById(1L)).thenReturn(Optional.of(alert));
+        when(alertRepository.save(any(Alert.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Alert updated = alertService.updatedAlert(1L, 250.0, "VOLUME", false);
 
         assertEquals(250.0, updated.getTargetPrice());
         assertEquals("VOLUME", updated.getAlertType());
         assertFalse(updated.isActive());
+
+        verify(alertRepository, times(1)).findById(1L);
+        verify(alertRepository, times(1)).save(alert);
     }
 }

@@ -53,7 +53,7 @@ public class AlertScheduler {
 
                 logger.info(message);
 
-                // Update alert (if you want to deactivate it or mark it triggered)
+                
                 alert.setActive(false);
                 alertService.updatedAlert(alert.getId(), alert.getTargetPrice(), alert.getAlertType(), false); // updates active status
             }

@@ -16,10 +16,9 @@ public class StockPriceServiceImplTest {
 
     @BeforeEach
     public void setup() {
-        // Initialize the service with null repository since we are only testing fake cache logic
         stockPriceService = new StockPriceServiceImpl(null);
 
-        // Setup fake cache
+        // Setting up fake cache
         stockPriceService.setFakeCacheMap(new HashMap<>());
     }
 
@@ -42,7 +41,7 @@ public class StockPriceServiceImplTest {
         StockPriceCache cache = new StockPriceCache();
         cache.setStockSymbol("TATAMOTORS");
         cache.setPrice(100.0);
-        cache.setLastUpdated(LocalDateTime.now().minusHours(2)); // Expired cache
+        cache.setLastUpdated(LocalDateTime.now().minusHours(2)); 
 
         stockPriceService.getFakeCacheMap().put("TATAMOTORS", cache);
 
@@ -53,7 +52,6 @@ public class StockPriceServiceImplTest {
 
     @Test
     public void testThrowsExceptionWhenNoCacheExists() {
-        // No entry added to cache
 
         assertThrows(StockPriceFetchException.class, () -> {
             stockPriceService.getPrice("TATAMOTORS");

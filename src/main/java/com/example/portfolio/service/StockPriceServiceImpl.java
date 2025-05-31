@@ -60,11 +60,10 @@ public class StockPriceServiceImpl implements StockPriceService {
             JSONObject json = new JSONObject(body);
             return json.has("lastPrice") ? json.getDouble("lastPrice") : null;
         } catch (Exception e) {
-            logger.error("❌ Error calling RapidAPI for {}: {}", symbol, e.getMessage());
+            logger.error("Error calling RapidAPI for {}: {}", symbol, e.getMessage());
             return null;
         }
     }
-
     @Override
     public double getPrice(String symbol) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -73,17 +72,16 @@ public class StockPriceServiceImpl implements StockPriceService {
         Double price = null;
 
         try {
-            price = future.get(5, TimeUnit.SECONDS); // timeout after 5 seconds
+            price = future.get(5, TimeUnit.SECONDS);
         } catch (TimeoutException te) {
-            logger.warn("⚠️ API timeout for symbol {}", symbol);
+            logger.warn("API timeout for symbol {}", symbol);
             future.cancel(true);
         } catch (Exception e) {
-            logger.error("⚠️ API exception for {}: {}", symbol, e.getMessage());
+            logger.error("API exception for {}: {}", symbol, e.getMessage());
         } finally {
             executor.shutdown();
         }
 
-        // ✅ If API succeeded, update cache and return
         if (price != null) {
             StockPriceCache cache = new StockPriceCache();
             cache.setStockSymbol(symbol);
@@ -94,20 +92,14 @@ public class StockPriceServiceImpl implements StockPriceService {
             return price;
         }
 
-        // ✅ If API failed, return price from cache if available and recent
         Optional<StockPriceCache> optionalCache = cacheRepository.findById(symbol);
         if (optionalCache.isPresent()) {
             StockPriceCache cached = optionalCache.get();
-            if (cached.getLastUpdated().isAfter(LocalDateTime.now().minusHours(cacheValidityHours))) {
-                logger.warn("⚠️ Using fallback cached price for {}: {}", symbol, cached.getPrice());
-                return cached.getPrice();
-            } else {
-                logger.warn("⚠️ Cached price for {} is outdated: {}", symbol, cached.getLastUpdated());
-            }
+            logger.warn("Using cached price for {} (may be outdated): {}", symbol, cached.getPrice());
+            return cached.getPrice(); 
         }
 
-        // ❌ Total failure
-        logger.error("❌ No valid price available for {}", symbol);
+        logger.error("No cached price found for {}", symbol);
         throw new StockPriceFetchException("Unable to fetch stock price for: " + symbol);
     }
 
@@ -135,7 +127,7 @@ public class StockPriceServiceImpl implements StockPriceService {
     @Override
     public void clearCache() {
         cacheRepository.deleteAll();
-        logger.info("🧹 Cache cleared");
+        logger.info("vCache cleared");
     }
 
     @Override
@@ -143,7 +135,7 @@ public class StockPriceServiceImpl implements StockPriceService {
         try {
             return fetchPriceFromRapidApi("TATAMOTORS") != null;
         } catch (Exception e) {
-            logger.error("❌ API availability check failed", e);
+            logger.error("API availability check failed", e);
             return false;
         }
     }

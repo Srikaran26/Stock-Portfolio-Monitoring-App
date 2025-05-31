@@ -39,10 +39,9 @@ public class ReportingController {
 		String contentType;
 		
 		if("pdf".equalsIgnoreCase(type)) {
-			data= reportService.generateExcelReport(portfolioId);
+			data= reportService.generatePdfReport(portfolioId);
 			fileName="portfolio_report.pdf";
 			contentType="application/pdf";
-			contentType="application/vnd.openxmlformats-officedocumentml.sheet";
 		}else {
 			data=reportService.generateExcelReport(portfolioId);
 			fileName="portfolio_report.xlsx";

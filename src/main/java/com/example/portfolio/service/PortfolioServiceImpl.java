@@ -41,6 +41,7 @@ public class PortfolioServiceImpl implements PortfolioService {
 		List<Portfolio> portfolios = requests.stream().map(req -> {
 			User user = new User();
 			user.setId(req.getUserId());
+			
 			return createPortfolio(user, req.getName(), req.getDescription());
 		}).collect(Collectors.toList());
 		logger.debug("Created portfolios: {}", portfolios);

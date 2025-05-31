@@ -116,42 +116,18 @@ Finance / Stock Market / Investment
 
 📁 **Project Structure**
 
-com.stockportfolio
-├── config
-├── controller
-├── dto
-├── entity
-├── exception
-├── repository
-├── security
-├── service
-└── StockPortfolioApplication.java
+<img width="281" alt="image" src="https://github.com/user-attachments/assets/d3620fc5-01ce-40d2-aa67-c746ffd4cb8d" />
+
 
 ------------------------------------------------------------------------------------------------
 
 🛠 **Optional Enhancements**
-|----------------------|--------------------------|
-| Feature              | Technology               |
-|----------------------|--------------------------|
-| Email Alerts         | JavaMailSender           |
-| Scheduled Price Fetch| @Scheduled tasks         |
-| Real-Time Updates    | WebSocket / Kafka        |
-| Frontend Dashboard   | React / Angular          |
-|----------------------|--------------------------|
+<img width="397" alt="image" src="https://github.com/user-attachments/assets/89661a97-a9e2-4799-a997-aae3dcf26200" />
 
 ------------------------------------------------------------------------------------------------
 
 🗂 **Suggested Sprints**
-|-------|-------------------------------------|
-| Week  |Deliverables                         |
-|-------|-------------------------------------|
-| 1     | Project setup, Auth & User Module   |
-| 2     | Portfolio & Holdings management     |
-| 3     | Stock price fetching and caching    |
-| 4     | Alerts & Notifications              |
-| 5     | Reporting & Analytics               |
-| 6     | Testing, Documentation, Deployment  |
-|-------|-------------------------------------|
+![image](https://github.com/user-attachments/assets/006ea68c-3046-4c5f-9c22-e8310f62bd98)
 
 ------------------------------------------------------------------------------------------------
 ▶️ **How to Run the Project**

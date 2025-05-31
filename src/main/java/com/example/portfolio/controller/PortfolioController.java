@@ -28,7 +28,6 @@ public class PortfolioController{
 		this.holdingRepository = holdingRepository;
 		this.portfolioRepository = portfolioRepository;
 	}
-	// Provides a list of all the portfolios for the user.
 	@GetMapping
 	public List<Portfolio> getPortfolios(@RequestParam Long userId){
 		logger.info("Fetching portfolios for userId: {}", userId);
@@ -36,7 +35,7 @@ public class PortfolioController{
 		user.setId(userId);
 		return portfolioService.listPortfolios(user);
 	}
-	// Creating a new Portfolio.
+
 	@PostMapping("/single")
 	public Portfolio createPortfolio(@RequestBody PortfolioRequest request) {
 		logger.info("Creating portfolio for userId: {}, name: {}", request.getUserId(), request.getName());
@@ -44,19 +43,18 @@ public class PortfolioController{
 		user.setId(request.getUserId());
 		return portfolioService.createPortfolio(user, request.getName(),  request.getDescription());
 	}
-	// Creating multiple portfolios for a user
+
 	@PostMapping("/bulk")
 	public List<Portfolio> createMultiplePortfolios(@RequestBody List<PortfolioRequest> requests) {
 		logger.info("Creating {} portfolios in bulk", requests.size());
 		return portfolioService.createMultiplePortfolios(requests);
 	}
-	// Updating the portfolio for the user based on id
+
 	@PutMapping("/{id}")
 	public Portfolio updatePortfolio(@PathVariable Long portfolioId, @RequestParam String username, @RequestParam String name, @RequestParam String description) {
 		logger.info("Updating portfolio with ID: {}", portfolioId, username);
 		return portfolioService.updatePortfolio(portfolioId,username,name,description);
 	}
-	//Deleting the portfolio based on the id
 	@DeleteMapping("/{id}") 
 	public String deletePortfolio(@PathVariable Long portfolioId, @RequestParam String username){
 		logger.info("Deleting portfolio with ID: {} for user: {}" , portfolioId, username);
@@ -64,7 +62,6 @@ public class PortfolioController{
 		logger.info("Portfolio with ID: {} deleted successfully", portfolioId);
 		return "Portfolio deleted successfully.";
 	}
-	//Displays the holdings based on the user's portfolio id
 	@GetMapping("/{id}/holdings")
 	public List<Holding> getHoldingsByPortfolio(@PathVariable("id") Long portfolioId) {
         logger.info("Fetching holdings for portfolio ID: {}", portfolioId);

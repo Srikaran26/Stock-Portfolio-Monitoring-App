@@ -11,7 +11,6 @@ public class StockPriceCache {
     private String stockSymbol;
 
     private double price;
-
     private LocalDateTime lastUpdated;
 
     public String getStockSymbol() {

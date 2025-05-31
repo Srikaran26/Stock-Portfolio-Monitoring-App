@@ -130,8 +130,16 @@ Finance / Stock Market / Investment
 
 🗂 **Suggested Sprints**
 
-
-![image](https://github.com/user-attachments/assets/006ea68c-3046-4c5f-9c22-e8310f62bd98)
+|-------|-----------------------------------------|
+| Week  | Deliverables                            |
+|-------|-----------------------------------------|
+| 1     | Project setup, Auth & User Module       |
+| 2     | Portfolio & Holdings management         |
+| 3     | Stock price fetching and caching        |
+| 4     | Alerts & Notifications                  |
+| 5     | Reporting & Analytics                   |
+| 6     | Testing, Documentation, Deployment      |
+|-------|-----------------------------------------|
 
 ------------------------------------------------------------------------------------------------
 ▶️ **How to Run the Project**

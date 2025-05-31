@@ -130,7 +130,6 @@ Finance / Stock Market / Investment
 
 🗂 **Suggested Sprints**
 
-|-------|-----------------------------------------|
 | Week  | Deliverables                            |
 |-------|-----------------------------------------|
 | 1     | Project setup, Auth & User Module       |
@@ -139,7 +138,7 @@ Finance / Stock Market / Investment
 | 4     | Alerts & Notifications                  |
 | 5     | Reporting & Analytics                   |
 | 6     | Testing, Documentation, Deployment      |
-|-------|-----------------------------------------|
+
 
 ------------------------------------------------------------------------------------------------
 ▶️ **How to Run the Project**
